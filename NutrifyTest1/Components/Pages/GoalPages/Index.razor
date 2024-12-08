@@ -1,0 +1,39 @@
+﻿@page "/goals"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using NutrifyTest1.Components.Domain
+@using NutrifyTest1.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="goals/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Goal">
+    <PropertyColumn Property="goal => goal.GoalType" />
+    <PropertyColumn Property="goal => goal.TargetDate" />
+    <PropertyColumn Property="goal => goal.TargetCalories" />
+    <PropertyColumn Property="goal => goal.UserID" />
+
+    <TemplateColumn Context="goal">
+        <a href="@($"goals/edit?goalid={goal.GoalID}")">Edit</a> |
+        <a href="@($"goals/details?goalid={goal.GoalID}")">Details</a> |
+        <a href="@($"goals/delete?goalid={goal.GoalID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private NutrifyTest1Context context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,109 @@
+﻿@page "/userprogresses/edit"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>UserProgress</h2>
+<hr />
+@if (UserProgress is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="UserProgress" OnValidSubmit="UpdateUserProgress" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="UserProgress.UserProgressID" value="@UserProgress.UserProgressID" />
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date:</label>
+                    <InputDate id="date" @bind-Value="UserProgress.Date" class="form-control" />
+                    <ValidationMessage For="() => UserProgress.Date" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="weight" class="form-label">Weight:</label>
+                    <InputNumber id="weight" @bind-Value="UserProgress.Weight" class="form-control" />
+                    <ValidationMessage For="() => UserProgress.Weight" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="caloriesconsumed" class="form-label">CaloriesConsumed:</label>
+                    <InputNumber id="caloriesconsumed" @bind-Value="UserProgress.CaloriesConsumed" class="form-control" />
+                    <ValidationMessage For="() => UserProgress.CaloriesConsumed" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="nutrientsbreakdown" class="form-label">NutrientsBreakdown:</label>
+                    <InputText id="nutrientsbreakdown" @bind-Value="UserProgress.NutrientsBreakdown" class="form-control" />
+                    <ValidationMessage For="() => UserProgress.NutrientsBreakdown" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserID:</label>
+                    <InputNumber id="userid" @bind-Value="UserProgress.UserID" class="form-control" />
+                    <ValidationMessage For="() => UserProgress.UserID" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/userprogresses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int UserProgressID { get; set; }
+
+    [SupplyParameterFromForm]
+    private UserProgress? UserProgress { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        UserProgress ??= await context.UserProgress.FirstOrDefaultAsync(m => m.UserProgressID == UserProgressID);
+
+        if (UserProgress is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateUserProgress()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(UserProgress!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!UserProgressExists(UserProgress!.UserProgressID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/userprogresses");
+    }
+
+    private bool UserProgressExists(int userprogressid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.UserProgress.Any(e => e.UserProgressID == userprogressid);
+    }
+}

@@ -1,0 +1,59 @@
+﻿@page "/recipes/create"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Recipe</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Recipe" OnValidSubmit="AddRecipe" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Recipe.Name" class="form-control" /> 
+                <ValidationMessage For="() => Recipe.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="ingredientslist" class="form-label">IngredientsList:</label> 
+                <InputText id="ingredientslist" @bind-Value="Recipe.IngredientsList" class="form-control" /> 
+                <ValidationMessage For="() => Recipe.IngredientsList" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="targetcalories" class="form-label">TargetCalories:</label> 
+                <InputNumber id="targetcalories" @bind-Value="Recipe.TargetCalories" class="form-control" /> 
+                <ValidationMessage For="() => Recipe.TargetCalories" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="preparationinstructions" class="form-label">PreparationInstructions:</label> 
+                <InputText id="preparationinstructions" @bind-Value="Recipe.PreparationInstructions" class="form-control" /> 
+                <ValidationMessage For="() => Recipe.PreparationInstructions" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/recipes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Recipe Recipe { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddRecipe()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Recipe.Add(Recipe);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/recipes");
+    }
+}

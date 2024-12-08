@@ -1,0 +1,104 @@
+﻿@page "/recipes/edit"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Recipe</h2>
+<hr />
+@if (Recipe is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Recipe" OnValidSubmit="UpdateRecipe" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Recipe.RecipeID" value="@Recipe.RecipeID" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Recipe.Name" class="form-control" />
+                    <ValidationMessage For="() => Recipe.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="ingredientslist" class="form-label">IngredientsList:</label>
+                    <InputText id="ingredientslist" @bind-Value="Recipe.IngredientsList" class="form-control" />
+                    <ValidationMessage For="() => Recipe.IngredientsList" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="targetcalories" class="form-label">TargetCalories:</label>
+                    <InputNumber id="targetcalories" @bind-Value="Recipe.TargetCalories" class="form-control" />
+                    <ValidationMessage For="() => Recipe.TargetCalories" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="preparationinstructions" class="form-label">PreparationInstructions:</label>
+                    <InputText id="preparationinstructions" @bind-Value="Recipe.PreparationInstructions" class="form-control" />
+                    <ValidationMessage For="() => Recipe.PreparationInstructions" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/recipes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int RecipeID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Recipe? Recipe { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Recipe ??= await context.Recipe.FirstOrDefaultAsync(m => m.RecipeID == RecipeID);
+
+        if (Recipe is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateRecipe()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Recipe!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RecipeExists(Recipe!.RecipeID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/recipes");
+    }
+
+    private bool RecipeExists(int recipeid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Recipe.Any(e => e.RecipeID == recipeid);
+    }
+}

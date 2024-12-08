@@ -1,0 +1,69 @@
+﻿@page "/foodlogs/create"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>FoodLog</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="FoodLog" OnValidSubmit="AddFoodLog" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date:</label> 
+                <InputDate id="date" @bind-Value="FoodLog.Date" class="form-control" /> 
+                <ValidationMessage For="() => FoodLog.Date" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="time" class="form-label">Time:</label> 
+                <InputDate id="time" @bind-Value="FoodLog.Time" class="form-control" /> 
+                <ValidationMessage For="() => FoodLog.Time" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="servingsizelogged" class="form-label">ServingSizeLogged:</label> 
+                <InputNumber id="servingsizelogged" @bind-Value="FoodLog.ServingSizeLogged" class="form-control" /> 
+                <ValidationMessage For="() => FoodLog.ServingSizeLogged" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="totalcalories" class="form-label">TotalCalories:</label> 
+                <InputNumber id="totalcalories" @bind-Value="FoodLog.TotalCalories" class="form-control" /> 
+                <ValidationMessage For="() => FoodLog.TotalCalories" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserID:</label> 
+                <InputNumber id="userid" @bind-Value="FoodLog.UserID" class="form-control" /> 
+                <ValidationMessage For="() => FoodLog.UserID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="foodid" class="form-label">FoodID:</label> 
+                <InputNumber id="foodid" @bind-Value="FoodLog.FoodID" class="form-control" /> 
+                <ValidationMessage For="() => FoodLog.FoodID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/foodlogs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private FoodLog FoodLog { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddFoodLog()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.FoodLog.Add(FoodLog);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/foodlogs");
+    }
+}

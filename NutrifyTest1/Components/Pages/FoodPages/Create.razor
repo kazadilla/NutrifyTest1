@@ -1,0 +1,64 @@
+﻿@page "/foods/create"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Food</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Food" OnValidSubmit="AddFood" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Food.Name" class="form-control" /> 
+                <ValidationMessage For="() => Food.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="barcode" class="form-label">Barcode:</label> 
+                <InputText id="barcode" @bind-Value="Food.Barcode" class="form-control" /> 
+                <ValidationMessage For="() => Food.Barcode" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label> 
+                <InputText id="category" @bind-Value="Food.Category" class="form-control" /> 
+                <ValidationMessage For="() => Food.Category" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="servingsize" class="form-label">ServingSize:</label> 
+                <InputNumber id="servingsize" @bind-Value="Food.ServingSize" class="form-control" /> 
+                <ValidationMessage For="() => Food.ServingSize" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="nutrients" class="form-label">Nutrients:</label> 
+                <InputText id="nutrients" @bind-Value="Food.Nutrients" class="form-control" /> 
+                <ValidationMessage For="() => Food.Nutrients" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/foods">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Food Food { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddFood()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Food.Add(Food);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/foods");
+    }
+}

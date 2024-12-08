@@ -1,0 +1,52 @@
+﻿@page "/goals/details"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Goal</h2>
+    <hr />
+    @if (goal is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">GoalType</dt>
+            <dd class="col-sm-10">@goal.GoalType</dd>
+            <dt class="col-sm-2">TargetDate</dt>
+            <dd class="col-sm-10">@goal.TargetDate</dd>
+            <dt class="col-sm-2">TargetCalories</dt>
+            <dd class="col-sm-10">@goal.TargetCalories</dd>
+            <dt class="col-sm-2">UserID</dt>
+            <dd class="col-sm-10">@goal.UserID</dd>
+        </dl>
+        <div>
+            <a href="@($"/goals/edit?goalid={goal.GoalID}")">Edit</a> |
+            <a href="@($"/goals")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Goal? goal;
+
+    [SupplyParameterFromQuery]
+    private int GoalID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        goal = await context.Goal.FirstOrDefaultAsync(m => m.GoalID == GoalID);
+
+        if (goal is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

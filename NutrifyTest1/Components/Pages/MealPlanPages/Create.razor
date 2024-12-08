@@ -1,0 +1,64 @@
+﻿@page "/mealplans/create"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>MealPlan</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="MealPlan" OnValidSubmit="AddMealPlan" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="MealPlan.Name" class="form-control" /> 
+                <ValidationMessage For="() => MealPlan.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="startdate" class="form-label">StartDate:</label> 
+                <InputDate id="startdate" @bind-Value="MealPlan.StartDate" class="form-control" /> 
+                <ValidationMessage For="() => MealPlan.StartDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="enddate" class="form-label">EndDate:</label> 
+                <InputDate id="enddate" @bind-Value="MealPlan.EndDate" class="form-control" /> 
+                <ValidationMessage For="() => MealPlan.EndDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dailycaloriegoal" class="form-label">DailyCalorieGoal:</label> 
+                <InputNumber id="dailycaloriegoal" @bind-Value="MealPlan.DailyCalorieGoal" class="form-control" /> 
+                <ValidationMessage For="() => MealPlan.DailyCalorieGoal" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserID:</label> 
+                <InputNumber id="userid" @bind-Value="MealPlan.UserID" class="form-control" /> 
+                <ValidationMessage For="() => MealPlan.UserID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/mealplans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private MealPlan MealPlan { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMealPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MealPlan.Add(MealPlan);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/mealplans");
+    }
+}

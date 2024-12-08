@@ -1,0 +1,114 @@
+﻿@page "/foodlogs/edit"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>FoodLog</h2>
+<hr />
+@if (FoodLog is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="FoodLog" OnValidSubmit="UpdateFoodLog" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="FoodLog.FoodLogID" value="@FoodLog.FoodLogID" />
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date:</label>
+                    <InputDate id="date" @bind-Value="FoodLog.Date" class="form-control" />
+                    <ValidationMessage For="() => FoodLog.Date" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="time" class="form-label">Time:</label>
+                    <InputDate id="time" @bind-Value="FoodLog.Time" class="form-control" />
+                    <ValidationMessage For="() => FoodLog.Time" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="servingsizelogged" class="form-label">ServingSizeLogged:</label>
+                    <InputNumber id="servingsizelogged" @bind-Value="FoodLog.ServingSizeLogged" class="form-control" />
+                    <ValidationMessage For="() => FoodLog.ServingSizeLogged" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="totalcalories" class="form-label">TotalCalories:</label>
+                    <InputNumber id="totalcalories" @bind-Value="FoodLog.TotalCalories" class="form-control" />
+                    <ValidationMessage For="() => FoodLog.TotalCalories" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserID:</label>
+                    <InputNumber id="userid" @bind-Value="FoodLog.UserID" class="form-control" />
+                    <ValidationMessage For="() => FoodLog.UserID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="foodid" class="form-label">FoodID:</label>
+                    <InputNumber id="foodid" @bind-Value="FoodLog.FoodID" class="form-control" />
+                    <ValidationMessage For="() => FoodLog.FoodID" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/foodlogs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int FoodLogID { get; set; }
+
+    [SupplyParameterFromForm]
+    private FoodLog? FoodLog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        FoodLog ??= await context.FoodLog.FirstOrDefaultAsync(m => m.FoodLogID == FoodLogID);
+
+        if (FoodLog is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateFoodLog()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(FoodLog!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!FoodLogExists(FoodLog!.FoodLogID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/foodlogs");
+    }
+
+    private bool FoodLogExists(int foodlogid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.FoodLog.Any(e => e.FoodLogID == foodlogid);
+    }
+}

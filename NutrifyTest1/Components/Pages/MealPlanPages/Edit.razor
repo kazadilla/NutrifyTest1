@@ -1,0 +1,109 @@
+﻿@page "/mealplans/edit"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>MealPlan</h2>
+<hr />
+@if (MealPlan is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MealPlan" OnValidSubmit="UpdateMealPlan" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="MealPlan.MealPlanID" value="@MealPlan.MealPlanID" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="MealPlan.Name" class="form-control" />
+                    <ValidationMessage For="() => MealPlan.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="startdate" class="form-label">StartDate:</label>
+                    <InputDate id="startdate" @bind-Value="MealPlan.StartDate" class="form-control" />
+                    <ValidationMessage For="() => MealPlan.StartDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="enddate" class="form-label">EndDate:</label>
+                    <InputDate id="enddate" @bind-Value="MealPlan.EndDate" class="form-control" />
+                    <ValidationMessage For="() => MealPlan.EndDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dailycaloriegoal" class="form-label">DailyCalorieGoal:</label>
+                    <InputNumber id="dailycaloriegoal" @bind-Value="MealPlan.DailyCalorieGoal" class="form-control" />
+                    <ValidationMessage For="() => MealPlan.DailyCalorieGoal" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserID:</label>
+                    <InputNumber id="userid" @bind-Value="MealPlan.UserID" class="form-control" />
+                    <ValidationMessage For="() => MealPlan.UserID" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/mealplans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int MealPlanID { get; set; }
+
+    [SupplyParameterFromForm]
+    private MealPlan? MealPlan { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MealPlan ??= await context.MealPlan.FirstOrDefaultAsync(m => m.MealPlanID == MealPlanID);
+
+        if (MealPlan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMealPlan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MealPlan!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MealPlanExists(MealPlan!.MealPlanID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/mealplans");
+    }
+
+    private bool MealPlanExists(int mealplanid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MealPlan.Any(e => e.MealPlanID == mealplanid);
+    }
+}

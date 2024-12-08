@@ -1,0 +1,40 @@
+﻿@page "/userprogresses"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using NutrifyTest1.Components.Domain
+@using NutrifyTest1.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="userprogresses/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.UserProgress">
+    <PropertyColumn Property="userprogress => userprogress.Date" />
+    <PropertyColumn Property="userprogress => userprogress.Weight" />
+    <PropertyColumn Property="userprogress => userprogress.CaloriesConsumed" />
+    <PropertyColumn Property="userprogress => userprogress.NutrientsBreakdown" />
+    <PropertyColumn Property="userprogress => userprogress.UserID" />
+
+    <TemplateColumn Context="userprogress">
+        <a href="@($"userprogresses/edit?userprogressid={userprogress.UserProgressID}")">Edit</a> |
+        <a href="@($"userprogresses/details?userprogressid={userprogress.UserProgressID}")">Details</a> |
+        <a href="@($"userprogresses/delete?userprogressid={userprogress.UserProgressID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private NutrifyTest1Context context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,64 @@
+﻿@page "/emotionlogs/create"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>EmotionLog</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="EmotionLog" OnValidSubmit="AddEmotionLog" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date:</label> 
+                <InputDate id="date" @bind-Value="EmotionLog.Date" class="form-control" /> 
+                <ValidationMessage For="() => EmotionLog.Date" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="time" class="form-label">Time:</label> 
+                <InputDate id="time" @bind-Value="EmotionLog.Time" class="form-control" /> 
+                <ValidationMessage For="() => EmotionLog.Time" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="emotion" class="form-label">Emotion:</label> 
+                <InputText id="emotion" @bind-Value="EmotionLog.Emotion" class="form-control" /> 
+                <ValidationMessage For="() => EmotionLog.Emotion" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserID:</label> 
+                <InputNumber id="userid" @bind-Value="EmotionLog.UserID" class="form-control" /> 
+                <ValidationMessage For="() => EmotionLog.UserID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="recipeid" class="form-label">RecipeID:</label> 
+                <InputNumber id="recipeid" @bind-Value="EmotionLog.RecipeID" class="form-control" /> 
+                <ValidationMessage For="() => EmotionLog.RecipeID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/emotionlogs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private EmotionLog EmotionLog { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEmotionLog()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.EmotionLog.Add(EmotionLog);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/emotionlogs");
+    }
+}

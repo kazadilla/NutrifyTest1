@@ -1,0 +1,52 @@
+﻿@page "/recipes/details"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Recipe</h2>
+    <hr />
+    @if (recipe is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@recipe.Name</dd>
+            <dt class="col-sm-2">IngredientsList</dt>
+            <dd class="col-sm-10">@recipe.IngredientsList</dd>
+            <dt class="col-sm-2">TargetCalories</dt>
+            <dd class="col-sm-10">@recipe.TargetCalories</dd>
+            <dt class="col-sm-2">PreparationInstructions</dt>
+            <dd class="col-sm-10">@recipe.PreparationInstructions</dd>
+        </dl>
+        <div>
+            <a href="@($"/recipes/edit?recipeid={recipe.RecipeID}")">Edit</a> |
+            <a href="@($"/recipes")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Recipe? recipe;
+
+    [SupplyParameterFromQuery]
+    private int RecipeID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        recipe = await context.Recipe.FirstOrDefaultAsync(m => m.RecipeID == RecipeID);
+
+        if (recipe is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,104 @@
+﻿@page "/goals/edit"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Goal</h2>
+<hr />
+@if (Goal is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Goal" OnValidSubmit="UpdateGoal" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Goal.GoalID" value="@Goal.GoalID" />
+                <div class="mb-3">
+                    <label for="goaltype" class="form-label">GoalType:</label>
+                    <InputText id="goaltype" @bind-Value="Goal.GoalType" class="form-control" />
+                    <ValidationMessage For="() => Goal.GoalType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="targetdate" class="form-label">TargetDate:</label>
+                    <InputDate id="targetdate" @bind-Value="Goal.TargetDate" class="form-control" />
+                    <ValidationMessage For="() => Goal.TargetDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="targetcalories" class="form-label">TargetCalories:</label>
+                    <InputText id="targetcalories" @bind-Value="Goal.TargetCalories" class="form-control" />
+                    <ValidationMessage For="() => Goal.TargetCalories" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserID:</label>
+                    <InputNumber id="userid" @bind-Value="Goal.UserID" class="form-control" />
+                    <ValidationMessage For="() => Goal.UserID" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/goals">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int GoalID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Goal? Goal { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Goal ??= await context.Goal.FirstOrDefaultAsync(m => m.GoalID == GoalID);
+
+        if (Goal is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateGoal()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Goal!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!GoalExists(Goal!.GoalID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/goals");
+    }
+
+    private bool GoalExists(int goalid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Goal.Any(e => e.GoalID == goalid);
+    }
+}

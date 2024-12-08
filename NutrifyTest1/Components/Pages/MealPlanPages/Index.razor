@@ -1,0 +1,40 @@
+﻿@page "/mealplans"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using NutrifyTest1.Components.Domain
+@using NutrifyTest1.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="mealplans/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.MealPlan">
+    <PropertyColumn Property="mealplan => mealplan.Name" />
+    <PropertyColumn Property="mealplan => mealplan.StartDate" />
+    <PropertyColumn Property="mealplan => mealplan.EndDate" />
+    <PropertyColumn Property="mealplan => mealplan.DailyCalorieGoal" />
+    <PropertyColumn Property="mealplan => mealplan.UserID" />
+
+    <TemplateColumn Context="mealplan">
+        <a href="@($"mealplans/edit?mealplanid={mealplan.MealPlanID}")">Edit</a> |
+        <a href="@($"mealplans/details?mealplanid={mealplan.MealPlanID}")">Details</a> |
+        <a href="@($"mealplans/delete?mealplanid={mealplan.MealPlanID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private NutrifyTest1Context context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

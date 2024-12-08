@@ -1,0 +1,64 @@
+﻿@page "/userprogresses/create"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>UserProgress</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="UserProgress" OnValidSubmit="AddUserProgress" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date:</label> 
+                <InputDate id="date" @bind-Value="UserProgress.Date" class="form-control" /> 
+                <ValidationMessage For="() => UserProgress.Date" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="weight" class="form-label">Weight:</label> 
+                <InputNumber id="weight" @bind-Value="UserProgress.Weight" class="form-control" /> 
+                <ValidationMessage For="() => UserProgress.Weight" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="caloriesconsumed" class="form-label">CaloriesConsumed:</label> 
+                <InputNumber id="caloriesconsumed" @bind-Value="UserProgress.CaloriesConsumed" class="form-control" /> 
+                <ValidationMessage For="() => UserProgress.CaloriesConsumed" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="nutrientsbreakdown" class="form-label">NutrientsBreakdown:</label> 
+                <InputText id="nutrientsbreakdown" @bind-Value="UserProgress.NutrientsBreakdown" class="form-control" /> 
+                <ValidationMessage For="() => UserProgress.NutrientsBreakdown" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserID:</label> 
+                <InputNumber id="userid" @bind-Value="UserProgress.UserID" class="form-control" /> 
+                <ValidationMessage For="() => UserProgress.UserID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/userprogresses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private UserProgress UserProgress { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddUserProgress()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.UserProgress.Add(UserProgress);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/userprogresses");
+    }
+}

@@ -1,0 +1,56 @@
+﻿@page "/foodlogs/details"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>FoodLog</h2>
+    <hr />
+    @if (foodlog is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Date</dt>
+            <dd class="col-sm-10">@foodlog.Date</dd>
+            <dt class="col-sm-2">Time</dt>
+            <dd class="col-sm-10">@foodlog.Time</dd>
+            <dt class="col-sm-2">ServingSizeLogged</dt>
+            <dd class="col-sm-10">@foodlog.ServingSizeLogged</dd>
+            <dt class="col-sm-2">TotalCalories</dt>
+            <dd class="col-sm-10">@foodlog.TotalCalories</dd>
+            <dt class="col-sm-2">UserID</dt>
+            <dd class="col-sm-10">@foodlog.UserID</dd>
+            <dt class="col-sm-2">FoodID</dt>
+            <dd class="col-sm-10">@foodlog.FoodID</dd>
+        </dl>
+        <div>
+            <a href="@($"/foodlogs/edit?foodlogid={foodlog.FoodLogID}")">Edit</a> |
+            <a href="@($"/foodlogs")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private FoodLog? foodlog;
+
+    [SupplyParameterFromQuery]
+    private int FoodLogID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        foodlog = await context.FoodLog.FirstOrDefaultAsync(m => m.FoodLogID == FoodLogID);
+
+        if (foodlog is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

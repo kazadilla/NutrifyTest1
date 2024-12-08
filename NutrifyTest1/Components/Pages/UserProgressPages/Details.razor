@@ -1,0 +1,54 @@
+﻿@page "/userprogresses/details"
+@using Microsoft.EntityFrameworkCore
+@using NutrifyTest1.Components.Domain
+@inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>UserProgress</h2>
+    <hr />
+    @if (userprogress is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Date</dt>
+            <dd class="col-sm-10">@userprogress.Date</dd>
+            <dt class="col-sm-2">Weight</dt>
+            <dd class="col-sm-10">@userprogress.Weight</dd>
+            <dt class="col-sm-2">CaloriesConsumed</dt>
+            <dd class="col-sm-10">@userprogress.CaloriesConsumed</dd>
+            <dt class="col-sm-2">NutrientsBreakdown</dt>
+            <dd class="col-sm-10">@userprogress.NutrientsBreakdown</dd>
+            <dt class="col-sm-2">UserID</dt>
+            <dd class="col-sm-10">@userprogress.UserID</dd>
+        </dl>
+        <div>
+            <a href="@($"/userprogresses/edit?userprogressid={userprogress.UserProgressID}")">Edit</a> |
+            <a href="@($"/userprogresses")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private UserProgress? userprogress;
+
+    [SupplyParameterFromQuery]
+    private int UserProgressID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        userprogress = await context.UserProgress.FirstOrDefaultAsync(m => m.UserProgressID == UserProgressID);
+
+        if (userprogress is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
