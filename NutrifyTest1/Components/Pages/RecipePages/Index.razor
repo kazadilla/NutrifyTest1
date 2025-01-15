@@ -6,19 +6,19 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<NutrifyTest1.Data.NutrifyTest1Context> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Recipes</PageTitle>
 
-<h1>Index</h1>
+<h1>Recipes</h1>
 
 <p>
     <a href="recipes/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Recipe">
-    <PropertyColumn Property="recipe => recipe.Name" />
-    <PropertyColumn Property="recipe => recipe.IngredientsList" />
-    <PropertyColumn Property="recipe => recipe.TargetCalories" />
-    <PropertyColumn Property="recipe => recipe.PreparationInstructions" />
+    <PropertyColumn Property="recipe => recipe.Name" Title="Recipe Name" />
+    <PropertyColumn Property="recipe => recipe.IngredientsList" Title="Ingredients List" />
+    <PropertyColumn Property="recipe => recipe.TargetCalories" Title="Total Calories" />
+    <PropertyColumn Property="recipe => recipe.PreparationInstructions" Title="Preparation Instructions" />
 
     <TemplateColumn Context="recipe">
         <a href="@($"recipes/edit?recipeid={recipe.RecipeID}")">Edit</a> |

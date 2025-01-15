@@ -28,17 +28,17 @@ else
                     <ValidationMessage For="() => Recipe.Name" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="ingredientslist" class="form-label">IngredientsList:</label>
+                    <label for="ingredientslist" class="form-label">Ingredients List:</label>
                     <InputText id="ingredientslist" @bind-Value="Recipe.IngredientsList" class="form-control" />
                     <ValidationMessage For="() => Recipe.IngredientsList" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="targetcalories" class="form-label">TargetCalories:</label>
+                    <label for="targetcalories" class="form-label">Total Calories:</label>
                     <InputNumber id="targetcalories" @bind-Value="Recipe.TargetCalories" class="form-control" />
                     <ValidationMessage For="() => Recipe.TargetCalories" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="preparationinstructions" class="form-label">PreparationInstructions:</label>
+                    <label for="preparationinstructions" class="form-label">Preparation Instructions:</label>
                     <InputText id="preparationinstructions" @bind-Value="Recipe.PreparationInstructions" class="form-control" />
                     <ValidationMessage For="() => Recipe.PreparationInstructions" class="text-danger" />
                 </div>
